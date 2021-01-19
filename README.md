@@ -44,7 +44,7 @@ If using Ionic,
 
 ### Setup
 
-Before installing the plugin, you must setup your app to receive push notifications.
+Before installing the plugin, you must setup your app to receive push notifications. 
 
 #### For Android
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/gcm-credentials) 
@@ -61,26 +61,26 @@ Before installing the plugin, you must setup your app to receive push notificati
 - Drag and Drop your `pushio_config.json` in Xcode project.
 - Select the root project and Under Capabilites add the "Push Notifications" and "Background Modes". 
 ![Capabilty Image](./img/ios_add_capability.png "Capabilty Image")
-- Copy `PushIOManager.framework`  and place it in the plugin  `PATH_TO_cordova-plugin-pushiomanager_DIRECTORY/frameworks/` folder before adding plugin to project. 
+- Download the plugin and copy `PushIOManager.framework`  and place it in the plugin  `PATH_TO_pushiomanager-cordova-plugin_DIRECTORY/frameworks/` folder before adding plugin to project. 
 
 
 ### Installation
 
 > **NOTE:** Before proceeding with the installation, we recommend you try out the [sample app](#sample-app) first to understand how the plugin works.
 
-> For iOS - Copy `PushIOManager.framework`  and place it in the plugin  `PATH_TO_cordova-plugin-pushiomanager_DIRECTORY/frameworks/` folder before adding plugin to project. 
+> For iOS - Download the plugin and copy `PushIOManager.framework`  and place it in the plugin  `PATH_TO_pushiomanager-cordova-plugin_DIRECTORY/frameworks/` folder before adding plugin to project. 
 
 
-The plugin can be installed with the Cordova CLI,
+The plugin can be installed with the Cordova CLI, 
 
 ```shell
-cordova plugin add https://github.com/oracle/cordova-plugin-pushiomanager
+cordova plugin add PATH_TO_pushiomanager-cordova-plugin_DIRECTORY
 ```
 
 For Ionic,
 
 ```shell
-ionic cordova plugin add https://github.com/oracle/cordova-plugin-pushiomanager
+ionic cordova plugin add PATH_TO_pushiomanager-cordova-plugin_DIRECTORY
 ```
 
 ### Integration
@@ -114,7 +114,10 @@ ionic cordova plugin add https://github.com/oracle/cordova-plugin-pushiomanager
 			<action android:name="android.intent.action.VIEW" />
 			<category android:name="android.intent.category.DEFAULT" />
 			<category android:name="android.intent.category.BROWSABLE" />
-			<data android:host="@string/app_links_url_host" android:pathPrefix="/pub/acc" android:scheme="https" />
+			<data android:host="@string/app_links_url_host" android:
+			
+			
+			Prefix="/pub/acc" android:scheme="https" />
        </intent-filter>
 		```
 		
