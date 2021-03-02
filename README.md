@@ -66,8 +66,6 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 ### Installation
 
-> **NOTE:** Before proceeding with the installation, we recommend you try out the [sample app](#sample-app) first to understand how the plugin works.
-
 Download the plugin,
 ```shell
 git clone https://github.com/oracle/cordova-plugin-pushiomanager
