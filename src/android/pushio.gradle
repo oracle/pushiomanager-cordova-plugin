@@ -6,7 +6,7 @@ repositories{
 }
 
 dependencies {
-    implementation (name: 'PushIOManager-6.47.1', ext: 'aar')
+    implementation (name: 'PushIOManager-6.47', ext: 'aar')
 }
 
 android {
