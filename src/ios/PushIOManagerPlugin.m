@@ -159,6 +159,15 @@
   }];
 }
 
+-(void)trackConversionEvent:(CDVInvokedUrlCommand*)command {
+    NSDictionary *properties = [command.arguments objectAtIndex:0];
+    PIOConversionEvent *event = [properties conversionEvent];
+    [[PushIOManager sharedInstance] trackConversionEvent: event completionHandler: ^(NSError *error, NSString *response){
+        NSLog(@"React trackEngagementMetric %@",(response ?: @"success"));
+        [self sendPluginResultToCallback:command.callbackId withResponse:response andError:error.description];
+    }];
+}
+
 -(void)resetEngagementContext:(CDVInvokedUrlCommand*)command {
     [[PushIOManager sharedInstance] resetEngagementContext];
     [self sendPluginResultToCallback:command.callbackId withResponse:nil andError:nil];
@@ -294,7 +303,7 @@
         value = nil;
     }
 
-    int type = [value intValue];
+    int type = ([value isEqualToString:@"STRING"] ? PIOPreferenceTypeString : ([value isEqualToString:@"NUMBER"] ? PIOPreferenceTypeNumeric : PIOPreferenceTypeBoolean)) ;
     NSError *error = nil;
     [[PushIOManager sharedInstance] declarePreference:key label:label type:type error:&error];
     [self sendPluginResultToCallback:command.callbackId withResponse:nil andError:error.description];
@@ -704,7 +713,7 @@
 }
 
 - (BOOL)handleOpenURL:(NSURL *)url {
-    if (url == nil || self.interceptCallbackId) {
+    if (url == nil || self.interceptCallbackId == nil) {
         return NO;
     }
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[url absoluteString]];
@@ -719,7 +728,7 @@
     if (value == (id)[NSNull null]) {
         value = nil;
     }
-    [[PushIOManager sharedInstance] setDelayRichPushDisplay:value];
+    [[PushIOManager sharedInstance] setDelayRichPushDisplay:[value boolValue]];
 }
 
 -(void)showRichPushMessage:(CDVInvokedUrlCommand*)command {

@@ -25,6 +25,8 @@ import org.json.JSONObject;
 import com.pushio.manager.PIOBadgeSyncListener;
 import com.pushio.manager.PIOBeaconRegion;
 import com.pushio.manager.PIOConfigurationListener;
+import com.pushio.manager.PIOConversionEvent;
+import com.pushio.manager.PIOConversionListener;
 import com.pushio.manager.PIOGeoRegion;
 import com.pushio.manager.PIOInteractiveNotificationCategory;
 import com.pushio.manager.PIOMCMessage;
@@ -85,7 +87,7 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             "setMessageCenterBadgingEnabled", "resetBadgeCount", "resetMessageCenter", "clearInAppMessages",
             "clearInteractiveNotificationCategories", "isResponsysPush", "handleMessage", "onMessageCenterViewVisible",
             "trackMessageCenterDisplayEngagement", "trackMessageCenterOpenEngagement", "onMessageCenterViewFinish",
-            "onDeepLinkReceived", "delayRichPushDisplay", "isRichPushDelaySet", "showRichPushMessage");
+            "onDeepLinkReceived", "delayRichPushDisplay", "isRichPushDelaySet", "showRichPushMessage", "trackConversionEvent");
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -970,8 +972,8 @@ public class PushIOManagerPlugin extends CordovaPlugin {
                 try {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("requestUrl", requestUrl);
-                    jsonObject.put("deeplinkUrl", deeplinkUrl);
-                    jsonObject.put("weblinkUrl", weblinkUrl);
+                    jsonObject.putOpt("deeplinkUrl", deeplinkUrl);
+                    jsonObject.putOpt("weblinkUrl", weblinkUrl);
                     callbackContext.success(jsonObject);
 
                 } catch (JSONException e) {
@@ -986,7 +988,7 @@ public class PushIOManagerPlugin extends CordovaPlugin {
                     JSONObject jsonObject = new JSONObject();
                     jsonObject.put("requestUrl", requestUrl);
                     jsonObject.put("errorReason", errorReason);
-                    callbackContext.error(jsonObject);
+                    callbackContext.success(jsonObject);
 
                 } catch (JSONException e) {
                     Log.v(TAG, "Exception: " + e.getMessage());
@@ -1046,5 +1048,43 @@ public class PushIOManagerPlugin extends CordovaPlugin {
     private void showRichPushMessage(JSONArray data, CallbackContext callbackContext) {
         mPushIOManager.showRichPushMessage();
         callbackContext.success();
+    }
+
+    private void trackConversionEvent(JSONArray data, CallbackContext callbackContext) {
+
+        try {          
+            int metric = data.getInt(0);
+            JSONObject propertiesObject = data.getJSONObject(1);
+
+            PIOConversionEvent conversionEvent = new PIOConversionEvent();
+            conversionEvent.setConversionType(metric);
+            conversionEvent.setOrderId(propertiesObject.getString("orderId"));
+            conversionEvent.setOrderAmount(Double.parseDouble(propertiesObject.getString("orderTotal")));
+            conversionEvent.setOrderQuantity(Integer.parseInt(propertiesObject.getString("orderQuantity")));
+
+            if(propertiesObject.has("customProperties")){
+                JSONObject customPropertiesObject = propertiesObject.optJSONObject("customProperties");
+    
+                if(customPropertiesObject != null){
+                    conversionEvent.setProperties(PushIOManagerPluginUtils.toMapStr(customPropertiesObject));
+                }
+            }
+
+            mPushIOManager.trackConversionEvent(conversionEvent, new PIOConversionListener() {
+                @Override
+                public void onSuccess() {
+                    callbackContext.success();
+                }
+
+                @Override
+                public void onFailure(Exception e) {
+                    callbackContext.error(e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+
     }
 }

@@ -175,7 +175,7 @@ PushIOManager.prototype.unregisterUserId = function (success, failure) {
 }
 
 /**
- * Declares a preference that will be used later with [setPreference()]{@link PushIOManager#setStringPreference}
+ * Declares a preference that will be used later with [set...Preference()]{@link PushIOManager#setStringPreference}
  * 
  * @param {string} key Unique ID for this preference.
  * @param {string} label Human-Readable description of this preference.
@@ -189,7 +189,7 @@ PushIOManager.prototype.declarePreference = function (key, label, type, success,
 }
 
 /**
- * Gets all preferences set earlier using [setPreference]{@link PushIOManager#setStringPreference}.
+ * Gets all preferences set earlier using [set...Preference()]{@link PushIOManager#setStringPreference}.
  * @param {function} [success] Success callback. 
  * @param {function} [failure] Failure callback.
  * @returns {Preference[]} Array of [Preference]{@link Preference} in success callback.
@@ -913,18 +913,6 @@ PushIOManager.prototype.onDeepLinkReceived = function (success, failure) {
     }
 }
 
-PushIOManager.prototype.setDelayRichPushDisplay = function (flag, success, failure) {
-    this.call_native(success, failure, "delayRichPushDisplay", [flag]);
-}
-
-PushIOManager.prototype.isRichPushDelaySet = function (success, failure) {
-    this.call_native(success, failure, "isRichPushDelaySet");
-}
-
-PushIOManager.prototype.showRichPushMessage = function (success, failure) {
-    this.call_native(success, failure, "showRichPushMessage");
-}
-
 /**
  * Seting `true` this method will delay te rich push messages until `showRichPushMessage` API is called. 
  * 
@@ -937,7 +925,6 @@ PushIOManager.prototype.showRichPushMessage = function (success, failure) {
 PushIOManager.prototype.setDelayRichPushDisplay = function (enabled, success, failure) {
     this.call_native(success, failure, "setDelayRichPushDisplay", [enabled]);
 }
-
 /**
  * Call this API to display rich push messages if they are being delayed with `setDelayRichPushDisplay`. 
  * 
@@ -971,6 +958,20 @@ PushIOManager.prototype.setInterceptOpenURL = function (enabled, success, failur
     this.call_native(success, failure, "setInterceptOpenURL", [enabled]);
 }
 
+/**
+ * Tracks the conversions for PUSHIO_ENGAGEMENT_METRIC_INAPP_PURCHASE and PUSHIO_ENGAGEMENT_METRIC_PURCHASE events.
+ * 
+ * @param {ConversionEvent} event
+ * @param {function} [success] Success callback. 
+ * @param {function} [failure] Failure callback. 
+ */
+PushIOManager.prototype.trackConversionEvent = function (event, success, failure) {
+    if (cordova.platformId === 'ios') {
+        event["conversionType"] = ((event["conversionType"] < 6) ? (event["conversionType"] - 1) : event["conversionType"]);
+    }
+
+    this.call_native(success, failure, "trackConversionEvent", [event]);
+}
 
 /**
  * @typedef {object} Preference
@@ -1047,6 +1048,16 @@ PushIOManager.prototype.setInterceptOpenURL = function (enabled, success, failur
  * @property {number} dwellTime
  * @property {object} extra
  */
+
+/**
+ * @typedef {object} ConversionEvent
+ * @property {string} orderId
+ * @property {number} orderTotal
+ * @property {number} orderQuantity
+ * @property {number} conversionType
+ * @property {object} customProperties
+ */
+
 
 if (!cordova.plugins) {
     cordova.plugins = {};

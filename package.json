@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-pushiomanager",
-  "version": "6.47.0",
+  "version": "6.48.0",
   "description": "Cordova Plugin for Responsys SDK",
   "cordova": {
     "id": "cordova-plugin-pushiomanager",

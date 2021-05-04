@@ -56,6 +56,16 @@
     return [[PIONotificationCategory alloc] initWithIdentifier:self[@"orcl_category"] actions:actions];
 }
 
+- (PIOConversionEvent *)conversionEvent {
+    NSString *orderId = self[@"orderId"];
+    double orderTotal = [self[@"orderTotal"] doubleValue];
+    NSInteger orderQuantity = [self[@"orderQuantity"] integerValue];
+    int conversionType = [self[@"conversionType"] intValue];
+    NSDictionary *customProperties = self[@"customProperties"];
+    PIOConversionEvent *conversion = [[PIOConversionEvent alloc] initWithOrderId:orderId orderTotal:orderTotal orderQuantity:orderQuantity conversionType:conversionType customProperties:customProperties];
+    return conversion;
+}
+
 + (NSDictionary *)dictionaryFromPreference:(PIOPreference *)preference {
     NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
     dictionary[@"key"] = preference.key;
@@ -63,13 +73,13 @@
     dictionary[@"label"] = preference.label;
       switch (preference.type) {
           case PIOPreferenceTypeString:
-              dictionary[@"type"] = @"PIOPreferenceTypeString";
+              dictionary[@"type"] = @"STRING";
               break;
           case PIOPreferenceTypeBoolean:
-              dictionary[@"type"] = @"PIOPreferenceTypeBoolean";
+              dictionary[@"type"] = @"BOOLEAN";
               break;
           case PIOPreferenceTypeNumeric:
-              dictionary[@"type"] = @"PIOPreferenceTypeNumeric";
+              dictionary[@"type"] = @"NUMBER";
               break;
       }
     return dictionary;
