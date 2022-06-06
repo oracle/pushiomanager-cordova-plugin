@@ -5,14 +5,14 @@ This plugin makes it easy to integrate your Cordova based mobile app with the Re
 ### Table of Contents
 - [Requirements](#requirements)
 - [Setup](#setup)
-  * [For Android](#for-android-1)
-  * [For iOS](#for-ios-1)
+  * [For Android](#for-android)
+  * [For iOS](#for-ios)
 - [Installation](#installation)
   * [Capacitor Push Plugin](#capacitor-push-plugin)
   * [Responsys Plugin](#responsys-plugin)
 - [Integration](#integration)
-  * [For Android](#for-android-2)
-  * [For iOS](#for-ios-2)
+  * [For Android](#for-android-1)
+  * [For iOS](#for-ios-1)
 - [Usage](#usage)
   * [Configure And Register](#configure-and-register)
   * [User Identification](#user-identification)
@@ -26,7 +26,6 @@ This plugin makes it easy to integrate your Cordova based mobile app with the Re
 
 <br/>
 
-<div id='requirements'/>
 ### Requirements
 
 - Capacitor >= 3.5.1
@@ -37,12 +36,12 @@ This plugin makes it easy to integrate your Cordova based mobile app with the Re
 
 <br/>
 
-<div id='setup'/>
+
 ### Setup
 
 Before installing the plugin, you must setup your app to receive push notifications.
 
-<div id='for-android-1'/>
+
 #### For Android 
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/gcm-credentials) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your FCM credentials (Project ID and Server API Key) for your Android app.
@@ -65,7 +64,7 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 <br/>
 
-<div id='for-ios-1'/>
+
 #### For iOS
 - [Generate Auth Key](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/auth-key/) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your Auth Key and other details for your iOS app.
@@ -77,10 +76,10 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 <br/>
 
-<div id='installation'/>
+
 ### Installation
 
-<div id='capacitor-push-plugin'/>
+
 #### Capacitor Push Plugin
 
 - Follow the steps [here](https://capacitorjs.com/docs/apis/push-notifications) to install the Capacitor push plugin. This is necessary for correctly handling the incoming push notifications.
@@ -103,7 +102,7 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 <br/>
 
-<div id='responsys-plugin'/>
+
 #### Responsys Plugin
 
 - Clone the plugin outside your app directory,
@@ -140,10 +139,10 @@ ionic cap sync <platform>
 <br/>
 
 
-<div id='integration'/>
+
 ### Integration
 
-<div id='for-android-2'/>
+
 #### For Android
 
 - Open the `AndroidManifest.xml` file located at `android/src/main` and add the following,
@@ -280,7 +279,7 @@ ionic cap sync <platform>
 
 <br/>
 
-<div id='for-ios-2'/>
+
 #### For iOS
 
 - Add `-ObjC` linker flag to Cordova Plugin target in pods project.
@@ -365,7 +364,7 @@ ionic cap sync <platform>
 
 <br/>
 
-<div id='usage'/>
+
 ### Usage
 
 The Responsys plugin can be accessed in JS code using the namespace `cordova.plugins.PushIOManager`,
@@ -391,7 +390,7 @@ export class MyPage {
 }
 ```
 
-<div id='configure-and-register'/>
+
 #### Configure And Register
 
 - Configure the SDK,
@@ -414,7 +413,7 @@ export class MyPage {
 	});
 	```
 	
-<div id='user-identification'/>
+
 #### User Identification
 
 - Associate an app installation with a user (usually after login),
@@ -438,7 +437,7 @@ export class MyPage {
 	```
 <br/>
 	
-<div id='engagements-and-conversion'/>
+
 #### Engagements And Conversion
 
 User actions can be attributed to a push notification using,
@@ -454,7 +453,7 @@ PushIOManager.trackEngagement(PushIOManager.engagementType.PUSHIO_ENGAGEMENT_MET
 
 <br/>
 
-<div id='in-app-messages'/>
+
 #### In-App Messages
 
 In-App Message (IAM) are displayed in a popup window via system-defined triggers like `$ExplicitAppOpen` or custom triggers. IAM that use system-defined triggers are displayed automatically.
@@ -474,7 +473,7 @@ IAM can also be displayed on-demand using custom triggers.
 	```
 <br/>
 
-<div id='message-center'/>
+
 #### Message Center
 
 - Get the Message Center messages list using,
@@ -501,7 +500,7 @@ IAM can also be displayed on-demand using custom triggers.
 	
 <br/>
 
-<div id='geofences-and-beacons'/>
+
 #### Geofences And Beacons
 
 If your app is setup to monitor geofence and beacons, you can use the following APIs to record in Responsys when a user enters/exits a geofence/beacon zone.
@@ -515,7 +514,7 @@ PushIOManager.onBeaconRegionExited(beaconRegion, (response) => {}, (error) => {}
 
 <br/>
 
-<div id='notification-preferences'/>
+
 #### Notification Preferences
 
 Preferences are used to record user-choices for push notifications. The preferences should be [pre-defined in Responsys](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/app-design/#notification-preferences) before being used in your app.
@@ -544,7 +543,7 @@ Do not use this as a key/value store as this data is purgeable.
 
 <br/>
 
-<div id='support'/>
+
 ### Support
 
 If you have access to My Oracle Support, please raise a request [here](http://support.oracle.com/), otherwise open an issue in this repository. 
@@ -552,7 +551,7 @@ If you have access to My Oracle Support, please raise a request [here](http://su
 
 <br/>
 
-<div id='license'/>
+
 ### License
 
 Copyright (c) 2022 Oracle and/or its affiliates and released under the Universal Permissive License (UPL), Version 1.0.
