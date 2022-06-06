@@ -1,5 +1,5 @@
 /**
- * Copyright © 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
  * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -42,16 +42,17 @@ PushIOManager.prototype.logLevel = {
     /** No logs will be printed. */
     NONE: 0,
     /** Logs will include only Errors level logs. */
-    ERROR: 1,
+     ERROR: cordova.platformId === 'android' ? 6 : 1,
     /** Logs will include only Info level logs. */
-    INFO: 2,
+     INFO: cordova.platformId === 'android' ? 4 : 2,
     /** Logs will include Warning level logs. */
-    WARN: 3,
+     WARN: cordova.platformId === 'android' ? 5 : 3,
     /** Logs will include Debug level logs. */
-    DEBUG: 4,
+     DEBUG: cordova.platformId === 'android' ? 3 : 4,
     /** Logs will include Verbose level logs. */
-    VERBOSE: 5
+     VERBOSE: cordova.platformId === 'android' ? 2 : 5
 }
+
 
 // Helper method to call the native bridge
 PushIOManager.prototype.call_native = function (success, failure, name, args) {
@@ -342,12 +343,34 @@ PushIOManager.prototype.trackEngagement = function (metric, properties, success,
  * @param {number} logLevel
  */
 PushIOManager.prototype.setLogLevel = function (logLevel, success, failure) {
-    if (cordova.platformId === 'android') {
-        var androidValues = [0, 6, 4, 5, 3, 2];
-        this.call_native(success, failure, "setLogLevel", [androidValues[logLevel]]);
+    this.call_native(success, failure, "setLogLevel", [logLevel]);
+}
+/**
+ * Sets delay in registration. 
+ *
+ * @param {boolean} delayRegistration
+ */
+ PushIOManager.prototype.setDelayRegistration = function (delayRegistration, success, failure) {
+    if (cordova.platformId === 'ios') {
+       this.call_native(success, failure, "setDelayRegistration", [delayRegistration]);
     } else {
-        this.call_native(success, failure, "setLogLevel", [logLevel]);
+        console.log("Not supported in android.");
     }
+}
+
+/**
+ * This api provides the status, if `setDelayRegistration` is enabled of not. 
+ * 
+ * @param {function} [success] Success callback. 
+ * @param {function} [failure] Failure callback.
+ */
+PushIOManager.prototype.isDelayRegistration = function (success, failure) {
+    if (cordova.platformId === 'ios') {
+       this.call_native(success, failure, "isDelayRegistration");
+    } else {
+        console.log("Not supported in android.");
+    }
+    
 }
 
 /**
@@ -948,7 +971,7 @@ PushIOManager.prototype.isRichPushDelaySet = function (success, failure) {
 
 /**
  * Call this API to intercept deep links/Open URLs sent by Responsys. 
- * You can intercept the URLs sent by Respinsys Open URL and overide SDK default behaviour.
+ * You can intercept the URLs sent by Responsys Open URL and overide SDK default behaviour.
  * 
  * @param {boolean} enabled Value of type Boolean.
  * @param {function} [success] Success callback. 
@@ -972,6 +995,66 @@ PushIOManager.prototype.trackConversionEvent = function (event, success, failure
 
     this.call_native(success, failure, "trackConversionEvent", [event]);
 }
+
+/**
+ * Sets the height of In-App banner message height.
+ * <br> Banner height should be between 100 and 200 (inclusive) density-independent unit.
+ *
+ * @param {number} height
+ * @param {function} [success] Success callback.
+ * @param {function} [failure] Failure callback.
+ */
+
+PushIOManager.prototype.setInAppMessageBannerHeight = function (height, success,failure) {
+    this.call_native(success, failure, "setInAppMessageBannerHeight", [height]);
+}
+
+/**
+ * Returns the height of In-App Banner message.
+ *
+ * @param {function} [success] Success callback.
+ * @param {function} [failure] Failure callback.
+ */
+
+PushIOManager.prototype.getInAppMessageBannerHeight = function (success,failure) {
+    this.call_native(success, failure, "getInAppMessageBannerHeight");
+}
+
+/**
+ * Sets the boolean to hide status bar of In-App Banner and Interstitial message
+ * <br> true to hide status bar otherwise false
+ *
+ * @param {boolean} hideStatusBar
+ * @param {function} [success] Success callback.
+ * @param {function} [failure] Failure callback.
+ */
+
+PushIOManager.prototype.setStatusBarHiddenForIAMBannerInterstitial = function (hideStatusBar, success,failure) {
+    this.call_native(success, failure, "setStatusBarHiddenForIAMBannerInterstitial", [hideStatusBar]);
+}
+
+/**
+ * Returns the boolean value of status bar hidden for In-App Banner and Interstitial message.
+ * <br> true if status bar hidden otherwise false
+ *
+ * @param {function} [success] Success callback.
+ * @param {function} [failure] Failure callback.
+ */
+
+PushIOManager.prototype.isStatusBarHiddenForIAMBannerInterstitial = function (success,failure) {
+    this.call_native(success, failure, "isStatusBarHiddenForIAMBannerInterstitial");
+}
+
+/**
+ * Returns the list of message centers that have been fetched.
+ * 
+ * @param {function} success 
+ * @param {function} failure Failure callback.
+ */
+PushIOManager.prototype.onMessageCenterUpdated = function (success, failure) {
+    this.call_native(success, failure, "onMessageCenterUpdated");
+}
+
 
 /**
  * @typedef {object} Preference

@@ -1,3 +1,4 @@
 .DS_Store
 Example/node_modules/
 *.framework/
+.idea/

@@ -7,9 +7,13 @@
 #import <PushIOManager/PushIOManagerAll.h>
 #import "NSArray+PIOConvert.h"
 #import "NSDictionary+PIOConvert.h"
-@interface PushIOManagerPlugin: CDVPlugin<PIODeepLinkDelegate> {
+#import <os/log.h>
+#import <UserNotifications/UserNotifications.h>
+
+@interface PushIOManagerPlugin: CDVPlugin<PIODeepLinkDelegate,UNUserNotificationCenterDelegate> {
 }
 @property (nonatomic, strong) NSString* interceptCallbackId;
+@property (nonatomic, strong) NSString*  notifyMCAsyncCallbackId;
 @end
 
 @implementation PushIOManagerPlugin
@@ -300,7 +304,8 @@
     }
     id value = [command.arguments objectAtIndex:2];
     if (value == (id)[NSNull null]) {
-        value = nil;
+        [self sendPluginResultToCallback:command.callbackId withResponse:nil andError:@"Preference type can't be NULL. Should be \"STRING\" or \"NUMBER\" or \"BOOLEAN\""];
+        return;
     }
 
     int type = ([value isEqualToString:@"STRING"] ? PIOPreferenceTypeString : ([value isEqualToString:@"NUMBER"] ? PIOPreferenceTypeNumeric : PIOPreferenceTypeBoolean)) ;
@@ -692,6 +697,11 @@
     [super pluginInitialize];
     [PushIOManager sharedInstance].notificationPresentationOptions = UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge | UNNotificationPresentationOptionSound;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onDeepLinkReceived:) name:PIORsysWebURLResolvedNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMessageCenterNotificationUpdate:) name:PIOMessageCenterUpdateNotification object:nil];
+    
+    //Capacitor support
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(setupCapacitor:) name:UIApplicationDidFinishLaunchingNotification object:nil];
 }
 
 - (void)setInterceptOpenURL:(CDVInvokedUrlCommand*)command {
@@ -741,5 +751,209 @@
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isRichPushDelaySet] callbackId:command.callbackId];
 }
 
+-(void)setDelayRegistration:(CDVInvokedUrlCommand*)command {
+    id value = [command.arguments objectAtIndex:0];
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL delayRegistration = [value boolValue];
+    [[PushIOManager sharedInstance] setDelayRegistration:delayRegistration];
+    [self sendPluginResultToCallback:command.callbackId withResponse:nil andError:nil];
+}
 
+-(void)isDelayRegistration:(CDVInvokedUrlCommand*)command {
+    BOOL isDelayRegistration = [[PushIOManager sharedInstance] delayRegistration];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isDelayRegistration] callbackId:command.callbackId];
+}
+
+-(void)setInAppMessageBannerHeight:(CDVInvokedUrlCommand*)command {
+    id value = [command.arguments objectAtIndex:0];
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL height = [value floatValue];
+    [[PushIOManager sharedInstance] setInAppMessageBannerHeight:height];
+    [self sendPluginResultToCallback:command.callbackId withResponse:nil andError:nil];
+}
+
+-(void)getInAppMessageBannerHeight:(CDVInvokedUrlCommand*)command {
+    CGFloat height = [[PushIOManager sharedInstance] getInAppMessageBannerHeight];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:height] callbackId:command.callbackId];
+}
+
+-(void)setStatusBarHiddenForIAMBannerInterstitial:(CDVInvokedUrlCommand*)command {
+    id value = [command.arguments objectAtIndex:0];
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL hideStatubar = [value boolValue];
+    [[PushIOManager sharedInstance] setStatusBarHiddenForIAMBannerInterstitial:hideStatubar];
+    [self sendPluginResultToCallback:command.callbackId withResponse:nil andError:nil];
+}
+
+
+-(void)isStatusBarHiddenForIAMBannerInterstitial:(CDVInvokedUrlCommand*)command {
+    BOOL hideStatusbar = [[PushIOManager sharedInstance] isStatusBarHiddenForIAMBannerInterstitial];
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:hideStatusbar] callbackId:command.callbackId];
+}
+
+-(void)onMessageCenterNotificationUpdate:(NSNotification *)notification{
+    
+    NSArray *messageCenters =  (NSArray *)[notification object];
+    
+    if (messageCenters != nil && messageCenters.count > 0){
+
+        NSString *messageCenter =  [messageCenters componentsJoinedByString:@","];
+        if(self.notifyMCAsyncCallbackId != nil){
+            CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:messageCenter];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:self.notifyMCAsyncCallbackId];
+            self.notifyMCAsyncCallbackId = nil;
+        }
+    }
+}
+
+-(void)onMessageCenterUpdated:(CDVInvokedUrlCommand*)command{
+
+    self.notifyMCAsyncCallbackId = command.callbackId;
+
+    // Send no result for synchronous callback
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void) didRegisterWithDeviceToken:(NSNotification *)notification
+{
+    
+    os_log(OS_LOG_DEFAULT, "didRegisterWithDeviceToken");
+    
+    NSData *token  = notification.object;
+    
+    if (token != nil) {
+        [[PushIOManager sharedInstance] didRegisterForRemoteNotificationsWithDeviceToken:token];
+    }
+}
+
+- (void) didFailToRegisterForRemoteNotifications:(NSNotification *)notification
+{
+    os_log(OS_LOG_DEFAULT, "didFailToRegisterForRemoteNotifications");
+    
+    NSError *error  = notification.object;
+    if (error == (id)[NSNull null]) {
+        error = nil;
+    }
+    
+    if (error != nil) {
+        [[PushIOManager sharedInstance] didFailToRegisterForRemoteNotificationsWithError:error];
+        
+    }
+}
+
+- (void)didReceiveNotificationInBackground:(NSNotification *)notification
+{
+    os_log(OS_LOG_DEFAULT, "didReceiveNotificationInBackground");
+    
+    NSDictionary *payload = notification.object[@"userInfo"];
+    
+    void (^completionHandler)(UIBackgroundFetchResult result) = notification.object[@"completionHandler"];
+    
+    if (payload != nil && [[PushIOManager sharedInstance] isResponsysPayload:payload]) {
+        
+    [[PushIOManager sharedInstance] didReceiveRemoteNotification:payload
+        fetchCompletionResult:UIBackgroundFetchResultNewData
+            fetchCompletionHandler:completionHandler];
+    }
+}
+
+-(void) didReceiveNotification:(NSNotification *)notification
+{
+    os_log(OS_LOG_DEFAULT, "didReceiveNotification");
+    
+    NSDictionary *response  = [notification object];
+    if (response != nil) {
+        NSDictionary *payload = [response parseNotificationPayload];
+        
+        if (payload != nil && [[PushIOManager sharedInstance] isResponsysPayload:payload]) {
+            
+            [[PushIOManager sharedInstance] didReceiveRemoteNotification:payload fetchCompletionResult:UIBackgroundFetchResultNewData fetchCompletionHandler:^(UIBackgroundFetchResult result) {
+            }];
+        }
+    }
+}
+
+-(void) setupCapacitor:(NSNotification *)notification
+{
+    UIViewController *vc = UIApplication.sharedApplication.delegate.window.rootViewController;
+    
+    NSString *className =  NSStringFromClass(vc.class);
+    
+    NSString *superClassName =  NSStringFromClass(vc.superclass);
+    
+     
+    if ([className containsString:@"CAPBridgeViewController"] ||[superClassName containsString:@"CAPBridgeViewController"] ) {
+        
+        NSDictionary *settings = [self.commandDelegate settings];
+        
+        if (settings != nil) {
+            NSString *key = [@"supportCapPushPlugin" lowercaseString];
+            BOOL supportPushPlugin = [settings[key] boolValue];
+            if (supportPushPlugin == false) {
+                UNUserNotificationCenter.currentNotificationCenter.delegate =  self;
+            }
+        }
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didRegisterWithDeviceToken:) name:@"CapacitorDidRegisterForRemoteNotificationsNotification" object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didFailToRegisterForRemoteNotifications:) name:@"CapacitorDidFailToRegisterForRemoteNotificationsNotification" object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleAppOpenURL:) name:@"CapacitorOpenURLNotification" object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNotificationInBackground:) name:@"didReceiveRemoteNotification" object:nil];
+    
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveNotification:) name:@"PushIODidReceiveNotification" object:nil];
+        
+    }
+}
+
+-(void) handleAppOpenURL:(NSNotification *)notification
+{
+    NSDictionary *userInfo = (NSDictionary *)[notification object];
+    id url = userInfo[@"url"];
+    if ([url isKindOfClass:[NSURL class]]) {
+        NSURL *aURL = url;
+        if(aURL != nil){
+            [[PushIOManager sharedInstance] openURL:aURL options:nil];
+        }
+    }
+    else if([url isKindOfClass:[NSString class]] && url != nil && [url length] > 0) {
+        NSString *urlString = url;
+        NSURL *aURL = [[NSURL alloc]initWithString:urlString];
+        if(url != nil){
+            [[PushIOManager sharedInstance] openURL:aURL options:nil];
+        }
+    }
+    
+}
+
+-(void) userNotificationCenter:(UNUserNotificationCenter *)center
+didReceiveNotificationResponse:(UNNotificationResponse *)response
+         withCompletionHandler:(void (^)(void))completionHandler{
+    NSLog( @"Handle push from background or closed" );
+    if ([[PushIOManager sharedInstance] isResponsysNotificationResponse: response]) {
+    [[PushIOManager sharedInstance] userNotificationCenter:center didReceiveNotificationResponse:response
+                                     withCompletionHandler:completionHandler];
+    }
+}
+
+-(void) userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler{
+    NSLog(@"Received remote notification: %@", notification.request.content.userInfo);
+    
+    if ([[PushIOManager sharedInstance] isResponsysNotificaton: notification]) {
+        
+    [[PushIOManager sharedInstance] userNotificationCenter:center willPresentNotification:notification
+                                     withCompletionHandler:completionHandler];
+    }
+}
 @end

@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (PIOConversionEvent *)conversionEvent;
 + (NSDictionary *)dictionaryFromPreference:(PIOPreference *)preference;
 - (NSString *)JSON;
+- (NSDictionary *)parseNotificationPayload;
 @end
 
 NS_ASSUME_NONNULL_END

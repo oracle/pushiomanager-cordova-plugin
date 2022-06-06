@@ -96,4 +96,18 @@
     return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
 }
 
+-(NSDictionary *)parseNotificationPayload {
+    
+    NSDictionary *payload =  nil;
+    
+    if (self[@"notification"][@"data"] != nil) {
+        payload = self[@"notification"][@"data"];
+    }else if (self[@"data"] != nil) {
+        payload = self[@"data"];
+    } else {
+        payload = self;
+    }
+    return  payload;
+}
+
 @end
