@@ -61,6 +61,13 @@ Before installing the plugin, you must setup your app to receive push notificati
 	include ':PushIOManager'
 	project(':PushIOManager').projectDir = new File(rootProject.projectDir, './PushIOManager')
 	```
+- Open `app/build.gradle` and update the `dependencies` list,
+
+	```gradle
+	dependencies {
+	    implementation project(':PushIOManager')
+	}
+	```
 
 <br/>
 
@@ -233,7 +240,7 @@ ionic cap sync <platform>
 - Create a native Intent Service - `MyFirebaseMessagingService.java` in `android/app/src/main/java/<your_package_name>`, as follows,
 
 	```java
-	public class PIOFirebaseMessagingService extends FirebaseMessagingService {
+	public class MyFirebaseMessagingService extends FirebaseMessagingService {
 	    @Override
 	    public void onNewToken(String token) {
 	    	super.onNewToken(token);
