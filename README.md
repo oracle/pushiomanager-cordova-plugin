@@ -283,6 +283,22 @@ IAM can also be displayed on-demand using custom triggers.
 	
 	Remember to store these messages, since the SDK cache is purgeable.
 	
+- If you wish to receive callback when new messages are available,
+
+	```javascript
+	PushIOManager.onMessageCenterUpdated((messageCenters) => {
+     		for (var i = 0; i < messageCenters.length; i++) {
+       			PushIOManager.fetchMessagesForMessageCenter(messageCenters[i], (response) => {
+         
+       			}, (error) => {
+         
+       			});
+     		}
+	}, (error) => {
+  
+	});
+	```
+	
 
 #### Geofences And Beacons
 
