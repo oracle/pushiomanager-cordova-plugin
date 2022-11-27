@@ -50,7 +50,7 @@ Before installing the plugin, you must setup your app to receive push notificati
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/gcm-credentials) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your FCM credentials (Project ID and Server API Key) for your Android app.
 - Download the `pushio_config.json` file generated from your credentials and include it in your project's `platforms/android/src/main/assets` folder.
-- Copy `PushIOManager-6.45.aar`  and place it in the project's `platforms/android/src/main/libs` folder. 
+- Copy `PushIOManager-6.53.1.aar`  and place it in the project's `platforms/android/src/main/libs` folder. 
 
 
 #### For iOS
@@ -66,26 +66,31 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 ### Installation
 
-Download the plugin,
-```shell
-git clone https://github.com/oracle/cordova-plugin-pushiomanager
-```
-
-
-> For iOS - Copy `PushIOManager.framework`  and place it in the plugin  `PATH_TO_cordova-plugin-pushiomanager_DIRECTORY/frameworks/` folder before adding plugin to project. 
-
-
-The plugin can be installed with the Cordova CLI,
+Install the plugin,
 
 ```shell
-cordova plugin add PATH_TO_pushiomanager-cordova-plugin_DIRECTORY
+npm install "https://github.com/oracle/pushiomanager-cordova-plugin.git#master" --save
 ```
+Run the below commands after installing the cordova-plugin-pushiomanager module 
 
-For Ionic,
+Create Framework directory
 
 ```shell
-ionic cordova plugin add PATH_TO_pushiomanager-cordova-plugin_DIRECTORY
+mkdir /ios/frameworks/
 ```
+
+Place the [latest iOS `PushIOManager.framework`](https://www.oracle.com/downloads/applications/cx/responsys-mobile-sdk.html) inside `ios/frameworks/`
+
+Copy files to node_modules/cordova-plugin-pushiomanager
+
+```shell
+cp -a ios/frameworks/. node_modules/cordova-plugin-pushiomanager/frameworks
+```
+
+After above these steps your framework directory should look like this.
+
+![FrameworkCopy](./img/framework_copy.png "Framework Copy")
+
 
 ### Integration
 
@@ -161,6 +166,7 @@ ionic cordova plugin add PATH_TO_pushiomanager-cordova-plugin_DIRECTORY
 
 
 #### For iOS
+
 - For In-App Messages and Rich Push Content follow the below steps :
   * To Enable Custom URI scheme for displaying In-App Messages and Rich Push content follow the [Step 1](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/ios/in-app-msg/). You don't need to add the code.
   You can find the API key in the `pushio_config.json` that was placed in your Xcode project earlier during setup.
@@ -325,6 +331,6 @@ If you have access to My Oracle Support, please raise a request [here](http://su
 
 ### License
 
-Copyright (c) 2021 Oracle and/or its affiliates and released under the Universal Permissive License (UPL), Version 1.0.
+Copyright (c) 2022 Oracle and/or its affiliates and released under the Universal Permissive License (UPL), Version 1.0.
 
 Oracle and Java are registered trademarks of Oracle and/or its affiliates. Other names may be trademarks of their respective owners.

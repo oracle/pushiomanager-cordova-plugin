@@ -1,5 +1,5 @@
 /**
- * Copyright © 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
  * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
 
@@ -11,6 +11,7 @@ import org.apache.cordova.CordovaInterface;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.firebase.messaging.RemoteMessage;
 import com.pushio.manager.PIOBadgeSyncListener;
 import com.pushio.manager.PIOBeaconRegion;
 import com.pushio.manager.PIOConfigurationListener;
@@ -33,6 +35,7 @@ import com.pushio.manager.PIOMCMessage;
 import com.pushio.manager.PIOMCMessageError;
 import com.pushio.manager.PIOMCMessageListener;
 import com.pushio.manager.PIOMCRichContentListener;
+import com.pushio.manager.PIOMessageCenterUpdateListener;
 import com.pushio.manager.PIORegionCompletionListener;
 import com.pushio.manager.PIORegionEventType;
 import com.pushio.manager.PIORegionException;
@@ -87,7 +90,10 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             "setMessageCenterBadgingEnabled", "resetBadgeCount", "resetMessageCenter", "clearInAppMessages",
             "clearInteractiveNotificationCategories", "isResponsysPush", "handleMessage", "onMessageCenterViewVisible",
             "trackMessageCenterDisplayEngagement", "trackMessageCenterOpenEngagement", "onMessageCenterViewFinish",
-            "onDeepLinkReceived", "delayRichPushDisplay", "isRichPushDelaySet", "showRichPushMessage", "trackConversionEvent");
+            "onDeepLinkReceived", "setDelayRichPushDisplay", "isRichPushDelaySet", "showRichPushMessage", "trackConversionEvent",
+            "setNotificationSmallIconColor", "setNotificationSmallIcon", "setNotificationLargeIcon",
+            "setInAppMessageBannerHeight","getInAppMessageBannerHeight","setStatusBarHiddenForIAMBannerInterstitial",
+            "isStatusBarHiddenForIAMBannerInterstitial","onMessageCenterUpdated");
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -1028,7 +1034,7 @@ public class PushIOManagerPlugin extends CordovaPlugin {
         callbackContext.success();
     }
 
-    private void delayRichPushDisplay(JSONArray data, CallbackContext callbackContext) {
+    private void setDelayRichPushDisplay(JSONArray data, CallbackContext callbackContext) {
         try {
             boolean flag = data.getBoolean(0);
             mPushIOManager.delayRichPushDisplay(flag);
@@ -1053,19 +1059,18 @@ public class PushIOManagerPlugin extends CordovaPlugin {
     private void trackConversionEvent(JSONArray data, CallbackContext callbackContext) {
 
         try {          
-            int metric = data.getInt(0);
-            JSONObject propertiesObject = data.getJSONObject(1);
+            JSONObject propertiesObject = data.getJSONObject(0);
 
             PIOConversionEvent conversionEvent = new PIOConversionEvent();
-            conversionEvent.setConversionType(metric);
+            conversionEvent.setConversionType(Integer.parseInt(propertiesObject.getString("conversionType")));
             conversionEvent.setOrderId(propertiesObject.getString("orderId"));
-            conversionEvent.setOrderAmount(Double.parseDouble(propertiesObject.getString("orderTotal")));
-            conversionEvent.setOrderQuantity(Integer.parseInt(propertiesObject.getString("orderQuantity")));
+            conversionEvent.setOrderAmount(propertiesObject.getDouble("orderTotal"));
+            conversionEvent.setOrderQuantity(propertiesObject.getInt("orderQuantity"));
 
-            if(propertiesObject.has("customProperties")){
+            if (propertiesObject.has("customProperties")) {
                 JSONObject customPropertiesObject = propertiesObject.optJSONObject("customProperties");
-    
-                if(customPropertiesObject != null){
+
+                if (customPropertiesObject != null) {
                     conversionEvent.setProperties(PushIOManagerPluginUtils.toMapStr(customPropertiesObject));
                 }
             }
@@ -1086,5 +1091,200 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             callbackContext.error(e.getMessage());
         }
 
+    }
+
+    private void setNotificationSmallIconColor(JSONArray data, CallbackContext callbackContext) {
+        try{
+            String colorHex = data.getString(0);
+            if (!TextUtils.isEmpty(colorHex)) {
+                final int color = Color.parseColor(colorHex);
+                mPushIOManager.setNotificationSmallIconColor(color);
+            }
+        } catch (JSONException e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+    
+    private void setInAppMessageBannerHeight(JSONArray data, CallbackContext callbackContext){
+        try{
+            String colorHex = data.getString(0);
+            if (!TextUtils.isEmpty(colorHex)) {
+                final int color = Color.parseColor(colorHex);
+                mPushIOManager.setNotificationSmallIconColor(color);
+            }
+        } catch (JSONException e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setInAppMessageBannerHeight(JSONArray data, CallbackContext callbackContext) {
+        try {
+            int height = data.getInt(0);
+            mPushIOManager.setInAppMessageBannerHeight(height);
+        } catch (Exception e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setNotificationSmallIcon(JSONArray data, CallbackContext callbackContext) {
+        try {
+            String resourceName = data.getString(0);
+            if (!TextUtils.isEmpty(resourceName)) {
+
+                int resourceId = mAppContext.getResources().getIdentifier(
+                        resourceName, "drawable", mAppContext.getPackageName());
+
+                if (resourceId <= 0) {
+                    resourceId = mAppContext.getResources().getIdentifier(
+                            resourceName, "mipmap", mAppContext.getPackageName());
+                }
+
+                if (resourceId > 0) {
+                    JSONArray resourceIdArray = new JSONArray();
+                    resourceIdArray.put(resourceId);
+                    setDefaultSmallIcon(resourceIdArray, callbackContext);
+                }
+            }
+
+        } catch (JSONException e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setNotificationLargeIcon(JSONArray data, CallbackContext callbackContext) {
+
+        try {
+            String resourceName = data.getString(0);
+            if (!TextUtils.isEmpty(resourceName)) {
+
+                int resourceId = mAppContext.getResources().getIdentifier(
+                        resourceName, "drawable", mAppContext.getPackageName());
+
+                if (resourceId <= 0) {
+                    resourceId = mAppContext.getResources().getIdentifier(
+                            resourceName, "mipmap", mAppContext.getPackageName());
+                }
+
+                if (resourceId > 0) {
+                    JSONArray resourceIdArray = new JSONArray();
+                    resourceIdArray.put(resourceId);
+                    setDefaultLargeIcon(resourceIdArray, callbackContext);
+                }
+            }
+        } catch (JSONException e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setNotificationSmallIcon(JSONArray data, CallbackContext callbackContext) {
+        try{
+            String resourceName = data.getString(0);
+            if (!TextUtils.isEmpty(resourceName)) {
+
+                int resourceId = mAppContext.getResources().getIdentifier(
+                        resourceName, "drawable", mAppContext.getPackageName());
+
+                if (resourceId <= 0) {
+                    resourceId = mAppContext.getResources().getIdentifier(
+                            resourceName, "mipmap", mAppContext.getPackageName());
+                }
+
+                if (resourceId > 0) {
+                    JSONArray resourceIdArray = new JSONArray();
+                    resourceIdArray.put(resourceId);
+                    setDefaultSmallIcon(resourceIdArray, callbackContext);
+                }
+            }
+
+        } catch (JSONException e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void setNotificationLargeIcon(JSONArray data, CallbackContext callbackContext) {
+
+        try{
+            String resourceName = data.getString(0);
+            if (!TextUtils.isEmpty(resourceName)) {
+                
+                int resourceId = mAppContext.getResources().getIdentifier(
+                        resourceName, "drawable", mAppContext.getPackageName());
+
+                if (resourceId <= 0) {
+                    resourceId = mAppContext.getResources().getIdentifier(
+                            resourceName, "mipmap", mAppContext.getPackageName());
+                }
+
+                if (resourceId > 0) {
+                    JSONArray resourceIdArray = new JSONArray();
+                    resourceIdArray.put(resourceId);
+                    setDefaultLargeIcon(resourceIdArray,callbackContext);
+                }
+            }
+        } catch (JSONException e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void getInAppMessageBannerHeight(JSONArray data, CallbackContext callbackContext) {
+        int  height = mPushIOManager.getInAppMessageBannerHeight();
+        callbackContext.success(String.valueOf(height));
+    }
+
+    private void setStatusBarHiddenForIAMBannerInterstitial(JSONArray data, CallbackContext callbackContext) {
+        try {
+            boolean statusBarHidden = data.getBoolean(0);
+            mPushIOManager.setStatusBarHiddenForIAMBannerInterstitial(statusBarHidden);
+        } catch (Exception e) {
+            Log.v(TAG, "Exception: " + e.getMessage());
+            callbackContext.error(e.getMessage());
+        }
+    }
+
+    private void isResponsysPush(JSONArray data, CallbackContext callbackContext){
+        JSONObject remoteMessageJson = data.optJSONObject(0);
+
+        if(remoteMessageJson != null){
+            RemoteMessage remoteMessage = PushIOManagerPluginUtils.remoteMessageFromJson(remoteMessageJson);
+            boolean value = mPushIOManager.isResponsysPush(remoteMessage);
+            callbackContext.success(String.valueOf(value));
+        }else{
+            callbackContext.error("Push Payload cannot be null");
+        }
+    }
+
+    private void handleMessage(JSONArray data, CallbackContext callbackContext){
+        JSONObject remoteMessageJson = data.optJSONObject(0);
+
+        if(remoteMessageJson != null){
+            RemoteMessage remoteMessage = PushIOManagerPluginUtils.remoteMessageFromJson(remoteMessageJson);
+            mPushIOManager.handleMessage(remoteMessage);
+            callbackContext.success();
+        }else{
+            callbackContext.error("Push Payload cannot be null");
+        }
+    }
+    
+    private void isStatusBarHiddenForIAMBannerInterstitial(JSONArray data, CallbackContext callbackContext) {
+        boolean  result = mPushIOManager.isStatusBarHiddenForIAMBannerInterstitial();
+        callbackContext.success(String.valueOf(result)); 
+    }
+
+    private void onMessageCenterUpdated(JSONArray data, CallbackContext callbackContext) {
+        if (callbackContext != null) {
+            mPushIOManager.addMessageCenterUpdateListener(new PIOMessageCenterUpdateListener() {
+                @Override
+                public void onUpdate(List<String> messageCenters) {
+                    callbackContext.success(PushIOManagerPluginUtils.toJSONArray(messageCenters));
+                }
+            });
+        }
     }
 }

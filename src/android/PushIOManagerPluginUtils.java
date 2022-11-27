@@ -1,5 +1,5 @@
 /**
- * Copyright © 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
  * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -15,7 +15,8 @@ import com.pushio.manager.PIOInteractiveNotificationButton;
 import com.pushio.manager.PIOInteractiveNotificationCategory;
 import com.pushio.manager.PIORegionEventType;
 import com.pushio.manager.preferences.PushIOPreference;
-
+import com.google.firebase.messaging.RemoteMessage;
+ 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,6 +34,12 @@ import java.util.TimeZone;
 
 public class PushIOManagerPluginUtils {
     private static final String TAG = "pushio-cordova";
+    
+    private static final String FBM_KEY_COLLAPSE_KEY = "collapseKey";
+    private static final String FBM_KEY_DATA = "data";
+    private static final String FBM_KEY_MESSAGE_ID = "google.message_id";
+    private static final String FBM_KEY_MESSAGE_TYPE = "messageType";
+    private static final String FBM_KEY_TTL = "ttl";
     private static final String DATE_FORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ssZZZZZ";
 
     public static Map<String, Object> toMap(JSONObject jsonobj) throws JSONException {
@@ -74,6 +81,18 @@ public class PushIOManagerPluginUtils {
             list.add(value);
         }
         return list;
+    }
+
+    static JSONArray toJSONArray(List<String> list){
+        JSONArray jsonArray = new JSONArray();
+        
+        if(list != null){
+            for(String item : list){
+                jsonArray.put(item);
+            }
+        }
+
+        return jsonArray;
     }
 
     static JSONArray preferencesAsJsonArray(List<PushIOPreference> preferences) {
@@ -294,4 +313,43 @@ public class PushIOManagerPluginUtils {
         return null;
     }
 
+    static RemoteMessage remoteMessageFromJson(JSONObject obj){
+        
+        RemoteMessage.Builder builder = new RemoteMessage.Builder("rsys_internal");
+
+        if (obj.has(FBM_KEY_DATA)) {
+
+            if (obj.has(FBM_KEY_TTL)) {
+                builder.setTtl(obj.optInt(FBM_KEY_TTL));
+            }
+
+            if (obj.has(FBM_KEY_MESSAGE_ID)) {
+                builder.setMessageId(obj.optString(FBM_KEY_MESSAGE_ID));
+            }
+    
+            if (obj.has(FBM_KEY_MESSAGE_TYPE)) {
+                builder.setMessageType(obj.optString(FBM_KEY_MESSAGE_TYPE));
+            }
+    
+            if (obj.has(FBM_KEY_COLLAPSE_KEY)) {
+                builder.setCollapseKey(obj.optString(FBM_KEY_COLLAPSE_KEY));
+            }
+
+            JSONObject dataObj = obj.optJSONObject(FBM_KEY_DATA);
+
+            if(dataObj != null){
+                for (Iterator<String> iterator = dataObj.keys(); iterator.hasNext(); ) {
+                    final String key = iterator.next();
+                    builder.addData(key, dataObj.optString(key));
+                }
+            }
+        }else{
+                for (Iterator<String> iterator = obj.keys(); iterator.hasNext(); ) {    
+                    final String key = iterator.next();
+                    builder.addData(key, obj.optString(key));
+                }
+        }
+
+        return builder.build();
+    }
 }

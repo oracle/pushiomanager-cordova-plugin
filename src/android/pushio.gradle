@@ -1,12 +1,10 @@
 repositories{
-    jcenter()
-    flatDir{
-        dirs 'src/main/libs'
-    }
+    mavenCentral()
 }
 
 dependencies {
-    implementation (name: 'PushIOManager-6.48', ext: 'aar')
+    compileOnly fileTree(dir: '../PushIOManager', include: ['PushIOManager-6.53.1.aar'])
+    compileOnly 'com.google.firebase:firebase-messaging:18.0.0'
 }
 
 android {
