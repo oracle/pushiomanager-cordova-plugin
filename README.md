@@ -66,30 +66,25 @@ Before installing the plugin, you must setup your app to receive push notificati
 
 ### Installation
 
-Install the plugin,
-
+Download the plugin,
 ```shell
-npm install "https://github.com/oracle/pushiomanager-cordova-plugin.git#master" --save
-```
-Run the below commands after installing the cordova-plugin-pushiomanager module 
-
-Create Framework directory
-
-```shell
-mkdir /ios/frameworks/
+git clone https://github.com/oracle/cordova-plugin-pushiomanager
 ```
 
-Place the [latest iOS `PushIOManager.framework`](https://www.oracle.com/downloads/applications/cx/responsys-mobile-sdk.html) inside `ios/frameworks/`
+> For iOS - Copy `PushIOManager.framework`  and place it in the plugin  `PATH_TO_cordova-plugin-pushiomanager_DIRECTORY/frameworks/` folder before adding plugin to project. 
 
-Copy files to node_modules/cordova-plugin-pushiomanager
+
+The plugin can be installed with the Cordova CLI,
 
 ```shell
-cp -a ios/frameworks/. node_modules/cordova-plugin-pushiomanager/frameworks
+cordova plugin add PATH_TO_pushiomanager-cordova-plugin_DIRECTORY
 ```
 
-After above these steps your framework directory should look like this.
+For Ionic,
 
-![FrameworkCopy](./img/framework_copy.png "Framework Copy")
+```shell
+ionic cordova plugin add PATH_TO_pushiomanager-cordova-plugin_DIRECTORY
+```
 
 
 ### Integration
