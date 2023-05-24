@@ -1,4 +1,4 @@
-## Cordova Plugin for Responsys SDK
+# Cordova Plugin for Responsys SDK
 
 This plugin makes it easy to integrate your Cordova based mobile app with the Responsys SDK. 
 
