@@ -1,6 +1,6 @@
 {
   "name": "cordova-plugin-pushiomanager",
-  "version": "6.53.0",
+  "version": "7.0.0",
   "description": "Cordova Plugin for Responsys SDK",
   "cordova": {
     "id": "cordova-plugin-pushiomanager",
@@ -8,6 +8,9 @@
       "android",
       "ios"
     ]
+  },
+  "scripts": {
+    "preinstall": "node addFrameworks.js"
   },
   "keywords": [
     "ecosystem:cordova",
@@ -17,15 +20,15 @@
   "engines": [
     {
       "name": "cordova",
-      "version": ">=9.0.1"
+      "version": ">=12.0.0"
     },
     {
       "name": "cordova-android",
-      "version": ">=8.1.0"
+      "version": ">=13.0.0"
     },
     {
       "name": "cordova-ios",
-      "version": ">=5.1.1"
+      "version": ">=7.1.1"
     }
   ],
   "author": "Oracle Corp.",

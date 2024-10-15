@@ -1,11 +1,11 @@
 /**
-* Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
+* Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
 * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
 
 
 #import "AppDelegate+PushIOPlugin.h"
-#import <PushIOManager/PushIOManagerAll.h>
+#import <CX_Mobile_SDK/PushIOManagerAll.h>
 #if defined(__IPHONE_10_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_10_0
 @import UserNotifications;
 #endif

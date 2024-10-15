@@ -1,10 +1,12 @@
 /**
-* Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
+* Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
 * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
 
 #import <Cordova/CDV.h>
-#import <PushIOManager/PushIOManagerAll.h>
+#import <CX_Mobile_SDK/PushIOManagerAll.h>
+#import <CX_Mobile_SDK/ORACoreConfig.h>
+#import <CX_Mobile_SDK/ORACoreConstants.h>
 #import "NSArray+PIOConvert.h"
 #import "NSDictionary+PIOConvert.h"
 #import <os/log.h>
@@ -17,6 +19,20 @@
 @end
 
 @implementation PushIOManagerPlugin
+
+- (instancetype)init {
+    
+    self = [super init];
+    
+    if(self) {
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            ORACoreConfig *config = [[ORACoreConfig alloc] init];
+            [config setConfigValue:@"rsys" forKey:kORAModules];
+        });
+    } 
+    return  self;
+}
 
 - (void)registerUserId:(CDVInvokedUrlCommand*)command {
     NSString* userId = [command.arguments objectAtIndex:0];
@@ -39,8 +55,12 @@
 }
 
 - (void)registerApp:(CDVInvokedUrlCommand*)command {
-    NSError *error = nil;
-    [[PushIOManager sharedInstance] registerApp:&error completionHandler:^(NSError *error, NSString *response) {
+    id value = [command.arguments objectAtIndex:0];
+    if (value == (id)[NSNull null]) {
+        value = nil;
+    }
+    BOOL userLocation = [value boolValue];
+    [[PushIOManager sharedInstance] registerApp:nil useLocation:userLocation completionHandler:^(NSError *error, NSString *response) {
         [self sendPluginResultToCallback:command.callbackId withResponse:response andError:error.description];
     }];
 }
@@ -93,7 +113,6 @@
     }];
 }
 
-
 - (void)configureAndRegister:(CDVInvokedUrlCommand*)command {
     NSString* filename = [command.arguments objectAtIndex:0];
     if (filename == (id)[NSNull null]) {
@@ -113,11 +132,17 @@
         [[PushIOManager sharedInstance] registerForAllRemoteNotificationTypes:^(NSError *error, NSString *deviceToken) {
             if (nil == error) {
 
+                id value = [command.arguments objectAtIndex:0];
+                if (value == (id)[NSNull null]) {
+                    value = nil;
+                }
+                BOOL userLocation = [value boolValue];
+
                 //Configure other SDK APIs here, if needed eg: [[PushIOManager sharedInstance] registerUserID:@"A1B2C3D4"];
                 
                 //6. Register application with Responsys server. This API is responsible to send registration signal to Responsys server. This API sends all the values configured on SDK to server.
                 NSError *regTrackError = nil;
-                [[PushIOManager sharedInstance] registerApp:&regTrackError completionHandler:^(NSError *regAppError, NSString *response) {
+                [[PushIOManager sharedInstance] registerApp:&regTrackError useLocation:userLocation completionHandler:^(NSError *regAppError, NSString *response) {
                     if (nil == regAppError) {
                         NSLog(@"Application registered successfully!");
                     } else {
@@ -462,21 +487,6 @@
 -(void)isSDKConfigured:(CDVInvokedUrlCommand*)command {
     BOOL isSDKConfigured = [[PushIOManager sharedInstance] isSDKConfigured];
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isSDKConfigured] callbackId:command.callbackId];
-}
-
--(void)setCrashLoggingEnabled:(CDVInvokedUrlCommand*)command {
-    id value = [command.arguments objectAtIndex:0];
-    if (value == (id)[NSNull null]) {
-        value = nil;
-    }
-    BOOL enableCrashLogging = [value boolValue];
-    [[PushIOManager sharedInstance] setCrashLoggingEnabled:enableCrashLogging];
-    [self sendPluginResultToCallback:command.callbackId withResponse:nil andError:nil];
-}
-
--(void)isCrashLoggingEnabled:(CDVInvokedUrlCommand*)command {
-    BOOL isCrashLoggingEnabled = [[PushIOManager sharedInstance] isCrashLoggingEnabled];
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:isCrashLoggingEnabled] callbackId:command.callbackId];
 }
 
 -(void)setLoggingEnabled:(CDVInvokedUrlCommand*)command {
@@ -919,4 +929,16 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                                      withCompletionHandler:completionHandler];
     }
 }
+
+-(void)setInAppCustomCloseButton:(CDVInvokedUrlCommand*)command {
+    NSDictionary *customCloseBluttonInfo = [command.arguments objectAtIndex:0];
+    if (customCloseBluttonInfo == (id)[NSNull null]) {
+        customCloseBluttonInfo = nil;
+    }
+    UIButton *closeButtonui = [customCloseBluttonInfo customCloseButton];
+    if(closeButtonui != nil){
+      [[PushIOManager sharedInstance] setInAppMessageCloseButton:closeButtonui];
+    }
+}
+
 @end

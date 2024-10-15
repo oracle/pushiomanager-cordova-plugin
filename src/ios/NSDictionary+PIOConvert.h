@@ -1,11 +1,11 @@
 /**
-* Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
+* Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
 * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
 
 
 #import <Foundation/Foundation.h>
-#import <PushIOManager/PushIOManagerAll.h>
+#import <CX_Mobile_SDK/PushIOManagerAll.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSDictionary *)dictionaryFromPreference:(PIOPreference *)preference;
 - (NSString *)JSON;
 - (NSDictionary *)parseNotificationPayload;
+- (UIButton *)customCloseButton;
 @end
 
 NS_ASSUME_NONNULL_END

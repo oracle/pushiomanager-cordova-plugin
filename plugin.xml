@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-pushiomanager" version="6.53.0">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="cordova-plugin-pushiomanager" version="7.0.0">
     <name>PushIOManagerCordova</name>
     <js-module name="PushIOManager" src="www/PushIOManager.js">
         <clobbers target="PushIOManager" />
@@ -15,6 +15,7 @@
         <source-file src="src/android/PushIOManagerPlugin.java" target-dir="src/com/pushio/manager/cordova/" />
         <source-file src="src/android/PushIOManagerPluginUtils.java" target-dir="src/com/pushio/manager/cordova/" />
     </platform>
+
     <platform name="ios">
         <config-file parent="/*" target="config.xml">
             <feature name="PushIOManagerPlugin">
@@ -28,6 +29,6 @@
         <source-file src="src/ios/NSArray+PIOConvert.m" />
         <header-file src="src/ios/NSDictionary+PIOConvert.h" />
         <source-file src="src/ios/NSDictionary+PIOConvert.m" />
-        <framework src="./frameworks/PushIOManager.framework" custom="true" />
-    </platform>
+    <framework src="./frameworks/CX_Mobile_SDK.xcframework" custom="true"/>
+</platform> 
 </plugin>
