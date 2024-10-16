@@ -39,7 +39,7 @@ If using Ionic,
 - Cordova Android >= 13.0.0 
 
 #### For iOS
-- iOS 11 or later
+- iOS 12 or later
 - Cordova iOS >= 7.1.1 
 
 ### Setup
@@ -50,7 +50,8 @@ Before installing the plugin, you must setup your app to receive push notificati
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/gcm-credentials) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your FCM credentials (Project ID and Server API Key) for your Android app.
 - Download the `pushio_config.json` file generated from your credentials and include it in your project's `platforms/android/src/main/assets` folder.
-- Copy `PushIOManager-6.53.1.aar`  and place it in the project's `platforms/android/src/main/libs` folder. 
+- Copy `oracle-cx-mobile-base-7.0.1.aar` and place it in the project's `platforms/android/src/main/libs` folder. 
+> **_NOTE:_** Copy `oracle-cx-mobile-location-7.0.0.aar` to support Location feature in Android. 
 
 
 #### For iOS
