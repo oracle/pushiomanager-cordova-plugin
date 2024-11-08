@@ -1125,19 +1125,6 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             callbackContext.error(e.getMessage());
         }
     }
-    
-    private void setInAppMessageBannerHeight(JSONArray data, CallbackContext callbackContext){
-        try{
-            String colorHex = data.getString(0);
-            if (!TextUtils.isEmpty(colorHex)) {
-                final int color = Color.parseColor(colorHex);
-                mPushIOManager.setNotificationSmallIconColor(color);
-            }
-        } catch (JSONException e) {
-            Log.v(TAG, "Exception: " + e.getMessage());
-            callbackContext.error(e.getMessage());
-        }
-    }
 
     private void setInAppMessageBannerHeight(JSONArray data, CallbackContext callbackContext) {
         try {
@@ -1193,58 +1180,6 @@ public class PushIOManagerPlugin extends CordovaPlugin {
                     JSONArray resourceIdArray = new JSONArray();
                     resourceIdArray.put(resourceId);
                     setDefaultLargeIcon(resourceIdArray, callbackContext);
-                }
-            }
-        } catch (JSONException e) {
-            Log.v(TAG, "Exception: " + e.getMessage());
-            callbackContext.error(e.getMessage());
-        }
-    }
-
-    private void setNotificationSmallIcon(JSONArray data, CallbackContext callbackContext) {
-        try{
-            String resourceName = data.getString(0);
-            if (!TextUtils.isEmpty(resourceName)) {
-
-                int resourceId = mAppContext.getResources().getIdentifier(
-                        resourceName, "drawable", mAppContext.getPackageName());
-
-                if (resourceId <= 0) {
-                    resourceId = mAppContext.getResources().getIdentifier(
-                            resourceName, "mipmap", mAppContext.getPackageName());
-                }
-
-                if (resourceId > 0) {
-                    JSONArray resourceIdArray = new JSONArray();
-                    resourceIdArray.put(resourceId);
-                    setDefaultSmallIcon(resourceIdArray, callbackContext);
-                }
-            }
-
-        } catch (JSONException e) {
-            Log.v(TAG, "Exception: " + e.getMessage());
-            callbackContext.error(e.getMessage());
-        }
-    }
-
-    private void setNotificationLargeIcon(JSONArray data, CallbackContext callbackContext) {
-
-        try{
-            String resourceName = data.getString(0);
-            if (!TextUtils.isEmpty(resourceName)) {
-                
-                int resourceId = mAppContext.getResources().getIdentifier(
-                        resourceName, "drawable", mAppContext.getPackageName());
-
-                if (resourceId <= 0) {
-                    resourceId = mAppContext.getResources().getIdentifier(
-                            resourceName, "mipmap", mAppContext.getPackageName());
-                }
-
-                if (resourceId > 0) {
-                    JSONArray resourceIdArray = new JSONArray();
-                    resourceIdArray.put(resourceId);
-                    setDefaultLargeIcon(resourceIdArray,callbackContext);
                 }
             }
         } catch (JSONException e) {
