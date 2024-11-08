@@ -93,7 +93,7 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             "onDeepLinkReceived", "setDelayRichPushDisplay", "isRichPushDelaySet", "showRichPushMessage", "trackConversionEvent",
             "setNotificationSmallIconColor", "setNotificationSmallIcon", "setNotificationLargeIcon",
             "setInAppMessageBannerHeight","getInAppMessageBannerHeight","setStatusBarHiddenForIAMBannerInterstitial",
-            "isStatusBarHiddenForIAMBannerInterstitial","onMessageCenterUpdated");
+            "isStatusBarHiddenForIAMBannerInterstitial","onMessageCenterUpdated", "registerAppForPush");
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -556,6 +556,26 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             }
         });
         mPushIOManager.registerApp(isUseLocation);
+    }
+
+    private void registerAppForPush(JSONArray data, CallbackContext callbackContext) {
+
+        Boolean enabledNotifications = data.optBoolean(0);
+        Boolean isUseLocation = data.optBoolean(1);
+
+        mPushIOManager.registerPushIOListener(new PushIOListener() {
+            @Override
+            public void onPushIOSuccess() {
+                callbackContext.success();
+            }
+
+            @Override
+            public void onPushIOError(String s) {
+                callbackContext.error(s);
+            }
+        });
+
+        mPushIOManager.registerApp(enabledNotifications, isUseLocation);
     }
 
     private void unregisterApp(JSONArray data, CallbackContext callbackContext) {

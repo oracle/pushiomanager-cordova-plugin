@@ -3,7 +3,7 @@ repositories{
 }
 
 dependencies {
-    compileOnly fileTree(dir: '../PushIOManager', include: ['PushIOManager-6.53.1.aar'])
+    compileOnly fileTree(dir: '../PushIOManager', include: ['oracle-cx-mobile-base-7.0.1.aar'])
     compileOnly 'com.google.firebase:firebase-messaging:18.0.0'
 }
 

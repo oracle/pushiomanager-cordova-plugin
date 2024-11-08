@@ -433,6 +433,14 @@ PushIOManager.prototype.registerApp = function (useLocation, success, failure) {
     this.call_native(success, failure, "registerApp", [useLocation]);
 }
 
+PushIOManager.prototype.registerAppForPush = function (enablePushNotifications, useLocation, success, failure) {
+    if (cordova.platformId === 'android') {
+        this.call_native(success, failure, "registerAppForPush", [enablePushNotifications, useLocation]);
+    } else {
+        console.log("Not supported in iOS.");
+    }
+}
+
 /**
  * Asks user permissions for all push notifications types. i.e.: Sound/Badge/Alert types. 
  * 
