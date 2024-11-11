@@ -1,12 +1,12 @@
 /**
-* Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
+* Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
 * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
 
 
 #import "NSArray+PIOConvert.h"
 #import "NSDictionary+PIOConvert.h"
-#import <PushIOManager/PushIOManagerAll.h>
+#import <CX_Mobile_SDK/PushIOManagerAll.h>
 
 @implementation NSArray (PIOConvert)
 - (NSArray *)messageDictionary {

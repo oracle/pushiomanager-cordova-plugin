@@ -1,5 +1,5 @@
 /**
- * Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
  * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
  */
 
@@ -433,6 +433,14 @@ PushIOManager.prototype.registerApp = function (useLocation, success, failure) {
     this.call_native(success, failure, "registerApp", [useLocation]);
 }
 
+PushIOManager.prototype.registerAppForPush = function (enablePushNotifications, useLocation, success, failure) {
+    if (cordova.platformId === 'android') {
+        this.call_native(success, failure, "registerAppForPush", [enablePushNotifications, useLocation]);
+    } else {
+        console.log("Not supported in iOS.");
+    }
+}
+
 /**
  * Asks user permissions for all push notifications types. i.e.: Sound/Badge/Alert types. 
  * 
@@ -576,23 +584,6 @@ PushIOManager.prototype.fetchRichContentForMessage = function (messageID, succes
  */
 PushIOManager.prototype.setInAppFetchEnabled = function (inAppFetchEnabled, success, failure) {
     this.call_native(success, failure, "setInAppFetchEnabled", [inAppFetchEnabled]);
-}
-
-/**
- * @param {boolean} crashLoggingEnabled
- * @param {function} [success] Success callback. 
- * @param {function} [failure] Failure callback.
- */
-PushIOManager.prototype.setCrashLoggingEnabled = function (crashLoggingEnabled, success, failure) {
-    this.call_native(success, failure, "setCrashLoggingEnabled", [crashLoggingEnabled]);
-}
-
-/**
- * @param {function} [success] Success callback with boolean value. 
- * @param {function} [failure] Failure callback.
- */
-PushIOManager.prototype.isCrashLoggingEnabled = function (success, failure) {
-    this.call_native(success, failure, "isCrashLoggingEnabled");
 }
 
 /**
@@ -1095,90 +1086,25 @@ PushIOManager.prototype.onMessageCenterUpdated = function (success, failure) {
 
 
 /**
- * @typedef {object} Preference
- * @property {string} key - Unique Identifier for this preference.
- * @property {string} label - Human-Readable description of this preference.
- * @property {string} type - Data type of this preference. Possible values: 'STRING', 'NUMBER', 'BOOLEAN'.
- * @property {string} value - Preference value.
+ * Returns true if SDK is configured else returns false.
+ * 
+ * @param {function} success 
+ * @param {function} failure Failure callback.
  */
+PushIOManager.prototype.isSDKConfigured = function (success, failure) {
+    this.call_native(success, failure, "isSDKConfigured");
+}
 
 /**
- * @typedef {object} MessageCenterMessage
- * @property {string} messageID
- * @property {string} subject
- * @property {string} message
- * @property {string} iconURL
- * @property {string} messageCenterName
- * @property {string} deeplinkURL
- * @property {string} richMessageHTML
- * @property {string} richMessageURL
- * @property {string} sentTimestamp
- * @property {string} expiryTimestamp
- * @property {object} customKeyValuePairs
+ * customise in-app view close button with title, background color, title color and image.
+ * 
+ * @param {UIButton} closebutton
+ * @param {function} [success] Success callback.
+ * @param {function} [failure] Failure callback.
  */
-
-/**
- * @typedef {object} InteractiveNotificationCategory
- * @property {string} orcl_category
- * @property {InteractiveNotificationButton[]} orcl_btns
- */
-
-/**
- * @typedef {object} InteractiveNotificationButton
- * @property {string} id
- * @property {string} action 
- * @property {string} label
- */
-
-/**
- * @typedef {object} RemoteMessage
- * @property {string} to
- * @property {string=} collapseKey 
- * @property {string=} messageId
- * @property {string=} messageType
- * @property {string=} ttl
- * @property {object} data
- */
-
-/**
- * @typedef {object} GeoRegion
- * @property {string} geofenceId
- * @property {string} geofenceName 
- * @property {string} zoneName
- * @property {string} zoneId
- * @property {string} source
- * @property {number} deviceBearing
- * @property {number} deviceSpeed
- * @property {number} dwellTime
- * @property {object} extra
- */
-
-/**
- * @typedef {object} BeaconRegion
- * @property {string} beaconId
- * @property {string} beaconName 
- * @property {string} beaconTag
- * @property {string} beaconProximity
- * @property {string} iBeaconUUID
- * @property {number} iBeaconMajor
- * @property {number} iBeaconMinor
- * @property {string} eddyStoneId1
- * @property {string} eddyStoneId2
- * @property {string} zoneName
- * @property {string} zoneId
- * @property {string} source
- * @property {number} dwellTime
- * @property {object} extra
- */
-
-/**
- * @typedef {object} ConversionEvent
- * @property {string} orderId
- * @property {number} orderTotal
- * @property {number} orderQuantity
- * @property {number} conversionType
- * @property {object} customProperties
- */
+PushIOManager.prototype.setInAppCustomCloseButton = function (closebutton,success, failure) {
+    this.call_native(success, failure, "setInAppCustomCloseButton",[closebutton]);
+}
 
 
 if (!cordova.plugins) {

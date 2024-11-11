@@ -27,20 +27,20 @@ This plugin makes it easy to integrate your Cordova based mobile app with the Re
 
 ### Requirements
 
-- Cordova CLI >= 9.0.1
+- Cordova CLI >= 12.0.0
 
 If using Ionic, 
 
-- Ionic CLI >= 6.7.0
-- Ionic Framework >= 5.0.5 (@ionic/angular)
+- Ionic CLI >= 7.2.0
+- Ionic Framework >= 8.3.1 (@ionic/angular)
 
 #### For Android
 - Android SDK Tools >= 26.1.1
-- Cordova Android >= 8.1.0 
+- Cordova Android >= 13.0.0 
 
 #### For iOS
-- iOS 11 or later
-- Cordova iOS >= 5.1.1 
+- iOS 12 or later
+- Cordova iOS >= 7.1.1 
 
 ### Setup
 
@@ -50,7 +50,8 @@ Before installing the plugin, you must setup your app to receive push notificati
 - [Get FCM Credentials](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/android/gcm-credentials) 
 - Log in to the [Responsys Mobile App Developer Console](https://docs.oracle.com/en/cloud/saas/marketing/responsys-develop-mobile/dev-console/login/) and enter your FCM credentials (Project ID and Server API Key) for your Android app.
 - Download the `pushio_config.json` file generated from your credentials and include it in your project's `platforms/android/src/main/assets` folder.
-- Copy `PushIOManager-6.53.1.aar`  and place it in the project's `platforms/android/src/main/libs` folder. 
+- Copy `oracle-cx-mobile-base-7.0.1.aar` and place it in the project's `platforms/android/src/main/libs` folder. 
+> **_NOTE:_** Copy `oracle-cx-mobile-location-7.0.0.aar` to support Location feature in Android. 
 
 
 #### For iOS
@@ -61,7 +62,8 @@ Before installing the plugin, you must setup your app to receive push notificati
 - Drag and Drop your `pushio_config.json` in Xcode project.
 - Select the root project and Under Capabilites add the "Push Notifications" and "Background Modes". 
 ![Capabilty Image](./img/ios_add_capability.png "Capabilty Image")
-- Download and copy `PushIOManager.framework` and place it in the plugin `PATH_TO_pushiomanager-cordova-plugin_DIRECTORY/frameworks/` folder before adding plugin to project. 
+- Download and copy `CX_Mobile_SDK.xcframework` and place it in the plugin `PATH_TO_pushiomanager-cordova-plugin_DIRECTORY/frameworks/` folder before adding plugin to project. 
+> **_NOTE:_** Copy OracleCXLocationSDK.xcframework to support Location feature in iOS and add related Privacy Location descriptions in Info.plist, refer this for more info [Location Descriptions](https://developer.apple.com/documentation/corelocation/requesting-authorization-to-use-location-services#Provide-descriptions-of-how-you-use-location-services)
 
 
 ### Installation
@@ -71,7 +73,7 @@ Download the plugin,
 git clone https://github.com/oracle/cordova-plugin-pushiomanager
 ```
 
-> For iOS - Copy `PushIOManager.framework`  and place it in the plugin  `PATH_TO_cordova-plugin-pushiomanager_DIRECTORY/frameworks/` folder before adding plugin to project. 
+> For iOS - Copy `CX_Mobile_SDK.xcframework`  and place it in the plugin  `PATH_TO_cordova-plugin-pushiomanager_DIRECTORY/frameworks/` folder before adding plugin to project. 
 
 
 The plugin can be installed with the Cordova CLI,
@@ -349,6 +351,6 @@ Please consult the [security guide](./SECURITY.md) for our responsible security 
 
 ## License
 
-Copyright (c) 2022 Oracle and/or its affiliates and released under the Universal Permissive License (UPL), Version 1.0.
+Copyright (c) 2024 Oracle and/or its affiliates and released under the Universal Permissive License (UPL), Version 1.0.
 
 Oracle and Java are registered trademarks of Oracle and/or its affiliates. Other names may be trademarks of their respective owners.

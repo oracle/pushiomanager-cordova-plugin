@@ -1,5 +1,5 @@
 /**
- * Copyright © 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright © 2024, Oracle and/or its affiliates. All rights reserved.
  * Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
 */
 
@@ -93,7 +93,7 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             "onDeepLinkReceived", "setDelayRichPushDisplay", "isRichPushDelaySet", "showRichPushMessage", "trackConversionEvent",
             "setNotificationSmallIconColor", "setNotificationSmallIcon", "setNotificationLargeIcon",
             "setInAppMessageBannerHeight","getInAppMessageBannerHeight","setStatusBarHiddenForIAMBannerInterstitial",
-            "isStatusBarHiddenForIAMBannerInterstitial","onMessageCenterUpdated");
+            "isStatusBarHiddenForIAMBannerInterstitial","onMessageCenterUpdated", "registerAppForPush");
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -556,6 +556,26 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             }
         });
         mPushIOManager.registerApp(isUseLocation);
+    }
+
+    private void registerAppForPush(JSONArray data, CallbackContext callbackContext) {
+
+        Boolean enabledNotifications = data.optBoolean(0);
+        Boolean isUseLocation = data.optBoolean(1);
+
+        mPushIOManager.registerPushIOListener(new PushIOListener() {
+            @Override
+            public void onPushIOSuccess() {
+                callbackContext.success();
+            }
+
+            @Override
+            public void onPushIOError(String s) {
+                callbackContext.error(s);
+            }
+        });
+
+        mPushIOManager.registerApp(enabledNotifications, isUseLocation);
     }
 
     private void unregisterApp(JSONArray data, CallbackContext callbackContext) {
@@ -1105,19 +1125,6 @@ public class PushIOManagerPlugin extends CordovaPlugin {
             callbackContext.error(e.getMessage());
         }
     }
-    
-    private void setInAppMessageBannerHeight(JSONArray data, CallbackContext callbackContext){
-        try{
-            String colorHex = data.getString(0);
-            if (!TextUtils.isEmpty(colorHex)) {
-                final int color = Color.parseColor(colorHex);
-                mPushIOManager.setNotificationSmallIconColor(color);
-            }
-        } catch (JSONException e) {
-            Log.v(TAG, "Exception: " + e.getMessage());
-            callbackContext.error(e.getMessage());
-        }
-    }
 
     private void setInAppMessageBannerHeight(JSONArray data, CallbackContext callbackContext) {
         try {
@@ -1173,58 +1180,6 @@ public class PushIOManagerPlugin extends CordovaPlugin {
                     JSONArray resourceIdArray = new JSONArray();
                     resourceIdArray.put(resourceId);
                     setDefaultLargeIcon(resourceIdArray, callbackContext);
-                }
-            }
-        } catch (JSONException e) {
-            Log.v(TAG, "Exception: " + e.getMessage());
-            callbackContext.error(e.getMessage());
-        }
-    }
-
-    private void setNotificationSmallIcon(JSONArray data, CallbackContext callbackContext) {
-        try{
-            String resourceName = data.getString(0);
-            if (!TextUtils.isEmpty(resourceName)) {
-
-                int resourceId = mAppContext.getResources().getIdentifier(
-                        resourceName, "drawable", mAppContext.getPackageName());
-
-                if (resourceId <= 0) {
-                    resourceId = mAppContext.getResources().getIdentifier(
-                            resourceName, "mipmap", mAppContext.getPackageName());
-                }
-
-                if (resourceId > 0) {
-                    JSONArray resourceIdArray = new JSONArray();
-                    resourceIdArray.put(resourceId);
-                    setDefaultSmallIcon(resourceIdArray, callbackContext);
-                }
-            }
-
-        } catch (JSONException e) {
-            Log.v(TAG, "Exception: " + e.getMessage());
-            callbackContext.error(e.getMessage());
-        }
-    }
-
-    private void setNotificationLargeIcon(JSONArray data, CallbackContext callbackContext) {
-
-        try{
-            String resourceName = data.getString(0);
-            if (!TextUtils.isEmpty(resourceName)) {
-                
-                int resourceId = mAppContext.getResources().getIdentifier(
-                        resourceName, "drawable", mAppContext.getPackageName());
-
-                if (resourceId <= 0) {
-                    resourceId = mAppContext.getResources().getIdentifier(
-                            resourceName, "mipmap", mAppContext.getPackageName());
-                }
-
-                if (resourceId > 0) {
-                    JSONArray resourceIdArray = new JSONArray();
-                    resourceIdArray.put(resourceId);
-                    setDefaultLargeIcon(resourceIdArray,callbackContext);
                 }
             }
         } catch (JSONException e) {
