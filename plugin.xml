@@ -17,7 +17,7 @@
     </platform>
 
     <platform name="ios">
-        <config-file parent="/*" target="config.xml">
+<config-file parent="/*" target="config.xml">
             <feature name="PushIOManagerPlugin">
                 <param name="ios-package" value="PushIOManagerPlugin" onload="true" />
             </feature>
@@ -29,6 +29,6 @@
         <source-file src="src/ios/NSArray+PIOConvert.m" />
         <header-file src="src/ios/NSDictionary+PIOConvert.h" />
         <source-file src="src/ios/NSDictionary+PIOConvert.m" />
-    <framework src="./frameworks/CX_Mobile_SDK.xcframework" custom="true"/>
+        <framework src="./frameworks/CX_Mobile_SDK.xcframework" custom="true" embed="true"/>
 </platform> 
 </plugin>
