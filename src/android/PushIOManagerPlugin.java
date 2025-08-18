@@ -155,6 +155,11 @@ public class PushIOManagerPlugin extends CordovaPlugin {
                 mDeepLinkUrl = deepLinkUrl;
                 mWebLinkUrl = webLinkUrl;
             }
+
+            @Override
+            public void onFailure(String error) {
+                Log.e("PushIO", "Failed to receive deep link: " + error);
+            }
         });
     }
 
